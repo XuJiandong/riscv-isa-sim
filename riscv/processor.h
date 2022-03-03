@@ -454,7 +454,6 @@ public:
 
   const char* get_symbol(uint64_t addr);
 
-private:
   simif_t* sim;
   mmu_t* mmu; // main memory is always accessed via the mmu
   std::unordered_map<std::string, extension_t*> custom_extensions;
@@ -498,6 +497,7 @@ private:
   void parse_isa_string(const char*);
   void build_opcode_map();
   void register_base_instructions();
+
   insn_func_t decode_insn(insn_t insn);
 
   // Track repeated executions for processor_t::disasm()

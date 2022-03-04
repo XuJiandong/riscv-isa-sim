@@ -11,13 +11,14 @@ uint64_t rvv_new_processor(void);
 int rvv_execute(uint64_t processor, uint64_t instruction);
 /**
  *  offset: the offset in register file in bytes
- * 
+ *
  *  return: 0, success; otherwise, failed. Same to other functions
  */
-int rvv_get_registers(uint64_t processor, uint64_t offset, uint8_t *mem,
-                      uint64_t mem_size);
-int rvv_set_registers(uint64_t processor, uint64_t offset, uint8_t *mem,
-                      uint64_t mem_size);
+int rvv_get_vreg(uint64_t processor, uint64_t offset, uint8_t *mem, uint64_t mem_size);
+int rvv_set_vreg(uint64_t processor, uint64_t offset, uint8_t *mem, uint64_t mem_size);
+
+int rvv_get_xreg(uint64_t processor, uint64_t index, uint64_t *content);
+int rvv_set_xreg(uint64_t processor, uint64_t index, uint64_t content);
 
 uint64_t rvv_get_vlen(uint64_t processor);
 uint64_t rvv_get_elen(uint64_t processor);

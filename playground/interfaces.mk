@@ -18,6 +18,9 @@ spike-interfaces.o: spike-interfaces.cc spike-interfaces.h
 run-example: example
 	LD_LIBRARY_PATH=../build ./example
 
+fmt:
+	clang-format -i -style="{IndentWidth: 4, ColumnLimit: 140}" *.cc *.h
+
 clean:
 	rm -f *.o
 	rm -f example

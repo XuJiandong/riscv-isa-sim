@@ -1,4 +1,9 @@
-
+# before building it, run at root folder:
+#  $ apt-get install device-tree-compiler
+#  $ mkdir build
+#  $ cd build
+#  $ ../configure
+#  $ make
 
 CXX := c++
 CXXFLAGS := -g -O0  -fPIC -I../riscv  -I../build -I../softfloat

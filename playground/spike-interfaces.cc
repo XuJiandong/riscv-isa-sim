@@ -1,10 +1,46 @@
 #include "spike-interfaces.h"
+#include "mmu.h"
 #include "processor.h"
+#include "simif.h"
 #include <iostream>
 #include <string>
+// memory
+
+// this is the interface to the simulator used by the processors and memory
+class memory : public simif_t {
+  public:
+    memory(uint64_t size) {
+        mem = new uint8_t[size];
+        mem_size = size;
+    }
+    ~memory() { delete[] mem; }
+    virtual char *addr_to_mem(reg_t addr) { return NULL; }
+    virtual bool mmio_load(reg_t addr, size_t len, uint8_t *bytes) {
+        if ((addr + len) > mem_size) {
+            return false;
+        }
+        memcpy(bytes, mem + addr, len);
+        return true;
+    }
+    virtual bool mmio_store(reg_t addr, size_t len, const uint8_t *bytes) {
+        if ((addr + len) > mem_size) {
+            return false;
+        }
+        memcpy(mem + addr, bytes, len);
+
+        return true;
+    }
+    virtual void proc_reset(unsigned id) {}
+    virtual const char *get_symbol(uint64_t addr) { return NULL; }
+
+  private:
+    uint8_t *mem;
+    uint64_t mem_size;
+};
 
 uint64_t rvv_new_processor(void) {
-    processor_t *proc = new processor_t("RV64GCV", "MSU", "vlen:128,elen:64", NULL, 0, false, NULL, std::cerr);
+    memory *mem = new memory(4 * 1024 * 1024);
+    processor_t *proc = new processor_t("RV64GCV", "MSU", "vlen:128,elen:64", mem, 0, false, NULL, std::cerr);
     reg_t val = proc->state.sstatus->read();
     proc->state.sstatus->write(val | SSTATUS_VS);
     return (uint64_t)proc;
@@ -105,3 +141,31 @@ uint64_t rvv_get_vill(uint64_t processor) {
 }
 
 void rvv_delete_processor(uint64_t h) { delete (processor_t *)h; }
+
+int rvv_load_mem(uint64_t processor, uint64_t addr, uint64_t len, uint8_t *bytes) {
+    processor_t *proc = (processor_t *)processor;
+    mmu_t *mmu = proc->get_mmu();
+    if (addr < 4096) {
+        return -4;
+    }
+    bool success = mmu->mmio_load(addr, len, bytes);
+    if (success) {
+        return 0;
+    } else {
+        return -2;
+    }
+}
+
+int rvv_store_mem(uint64_t processor, uint64_t addr, uint64_t len, uint8_t *bytes) {
+    processor_t *proc = (processor_t *)processor;
+    if (addr < 4096) {
+        return -4;
+    }
+    mmu_t *mmu = proc->get_mmu();
+    bool success = mmu->mmio_store(addr, len, bytes);
+    if (success) {
+        return 0;
+    } else {
+        return -3;
+    }
+}

@@ -21,6 +21,16 @@
             "env": {
                 "LD_LIBRARY_PATH": "./build"
             }
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Launch mem",
+            "program": "${workspaceFolder}/playground/mem",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "LD_LIBRARY_PATH": "./build"
+            }
         }
     ]
 }

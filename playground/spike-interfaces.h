@@ -20,6 +20,19 @@ int rvv_set_vreg(uint64_t processor, uint64_t offset, uint8_t *mem, uint64_t mem
 int rvv_get_xreg(uint64_t processor, uint64_t index, uint64_t *content);
 int rvv_set_xreg(uint64_t processor, uint64_t index, uint64_t content);
 
+/**
+ * addr: the address of memory. The memory is in environment of risc-v execution.
+ * len: the length of memory
+ * bytes: the buffer to hold the content loaded from memory. It should have same length with `len`
+ * note:
+ * don't try to access the memory at [0, 4096]
+  // Disallow access to debug region when not in debug mode
+  if (addr >= DEBUG_START && addr <= DEBUG_END && proc && !proc->state.debug_mode)
+    return false;
+ */
+int rvv_load_mem(uint64_t processor, uint64_t addr, uint64_t len, uint8_t *bytes);
+int rvv_store_mem(uint64_t processor, uint64_t addr, uint64_t len, uint8_t *bytes);
+
 uint64_t rvv_get_vlen(uint64_t processor);
 uint64_t rvv_get_elen(uint64_t processor);
 uint64_t rvv_get_vl(uint64_t processor);
